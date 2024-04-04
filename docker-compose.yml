@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  blabladur:
+    build: .
+    ports:
+      - "2222:22"  # Map SSH port to host
+    volumes:
+      - ./app:/app  # Optional: mount your project directory for development
+    environment:
+      - "RUST_LOG=debug"  # Example: Set environment variables as needed

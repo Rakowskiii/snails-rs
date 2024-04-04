@@ -1,0 +1,16 @@
+[package]
+name = "unchecked-mint"
+version = "0.1.0"
+edition = "2021"
+authors = ["Maciej Rak <maciejrak@protonmail.com>"]
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+
+[dependencies]
+borsh = { version = "1.4.0", features = ["borsh-derive", "derive"] }
+solana-program = "1.18.8"
+solana-program-test = "1.18.8"
+solana-sdk = "1.18.8"
+spl-token = "4.0.0"
