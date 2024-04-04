@@ -14,8 +14,8 @@ impl Processor {
                 msg!("Hello {}! Welcome to Blabladur Solana Security Labs!", name);
                 Ok(())
             }
-            _ => {
-                msg!("Unhandled instruction!");
+            crate::instruction::BlabladurInstruction::NoOp => {
+                msg!("NoOp!");
                 Err(solana_program::program_error::ProgramError::InvalidInstructionData)
             }
         }

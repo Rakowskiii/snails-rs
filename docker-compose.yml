@@ -4,7 +4,7 @@ services:
   blabladur:
     build: .
     ports:
-      - "2222:22"  # Map SSH port to host
+      - "8080:8080"  # Map SSH port to host
     volumes:
       - ./app:/app  # Optional: mount your project directory for development
     environment:
