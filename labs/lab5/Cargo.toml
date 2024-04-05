@@ -16,5 +16,7 @@ solana-sdk = "1.18.8"
 spl-token = "4.0.0"
 
 
-[dev-dependencies]
-cargo-husky = "1"
+[dev-dependencies.cargo-husky]
+version = "1"
+default-features = false
+features = ["user-hooks"]

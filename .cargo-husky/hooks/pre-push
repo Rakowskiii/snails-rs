@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+echo '+cargo test --workspace -- test_proper_flow'
+cargo test --workspace -- test_proper_flow
