@@ -1,4 +1,4 @@
-# Solana Native Security Labs
+# Solana Native Auditing Introductory Labs
 
 Welcome to Solana Native Security Labs! This repository is designed to equip you with a deep understanding of common vulnerabilities in Solana programs and best practices for securing them. Through hands-on labs, you'll learn how to identify and mitigate potential security threats in blockchain development, ensuring the integrity and security of your Solana applications.
 
