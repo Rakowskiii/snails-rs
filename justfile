@@ -13,9 +13,9 @@ _get_lab_number $lab_number:
 test lab_number:
     #!/bin/bash
     lab_name=$(just _get_lab_number {{lab_number}}) 
-    cargo test --package $lab_name test_proper_flow -- --nocapture
+    cargo test --package $lab_name --test mod -- test_proper_flow -- --nocapture
 
 hack $lab_number:
     #!/bin/bash
     lab_name=$(just _get_lab_number {{lab_number}})
-    cargo test --package $lab_name hack -- --nocapture
+    cargo test --package $lab_name --test mod --  hack -- --nocapture
