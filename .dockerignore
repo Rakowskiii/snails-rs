@@ -5,3 +5,4 @@ Dockerfile
 .gitignore
 .git
 .cargo-husky
+Cargo.lock

@@ -5,7 +5,7 @@ FROM ubuntu:jammy
 ARG SOLANA_VERSION=v1.17.28
 
 # Install necessary packages for SSH and other dependencies
-RUN apt-get update && apt-get install -y openssh-server curl build-essential pkg-config libssl-dev bzip2 wget sudo zsh vim jq
+RUN apt-get update && apt-get install -y curl build-essential pkg-config libssl-dev sudo zsh vim jq 
 
 SHELL ["/bin/zsh", "-c"]
 # Install code-server (VS Code server)
@@ -32,10 +32,7 @@ RUN code-server --install-extension rust-lang.rust-analyzer \
     && mkdir -p /home/student/.local/share/code-server/User && \
     echo '{\n    "workbench.colorTheme": "Base16 Dark Default"\n}' > /home/student/.local/share/code-server/User/settings.json
 
-# ============= Rust Toolchain =============
-USER student
-RUN curl https://sh.rustup.rs -sSf | zsh -s -- -y
-USER root
+
 
 
 # =========== Setting Up the Project ===========
@@ -48,6 +45,13 @@ RUN chown -R student:student /home/student
 
 # Copy your project directory into the Docker image at /home/student
 COPY . /home/student/blabladur
+
+# ============= Rust Toolchain =============
+USER student
+RUN curl https://sh.rustup.rs -sSf | zsh -s -- -y 
+RUN cargo build 
+RUN cargo install just
+USER root
 
 # Expose the code-server port
 EXPOSE 8080

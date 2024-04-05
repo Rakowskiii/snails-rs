@@ -5,4 +5,4 @@ echo '[1/2] +cargo fmt --check '
 cargo fmt --check
 
 echo '[2/2] +cargo clippy -D warnings'
-cargo clippy -D warnings
+cargo clippy -- -D warnings
