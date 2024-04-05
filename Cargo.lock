@@ -14,9 +14,10 @@ dependencies = [
 
 [[package]]
 name = "account-confusion"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -744,6 +745,12 @@ dependencies = [
  "libc",
  "thiserror",
 ]
+
+[[package]]
+name = "cargo-husky"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b02b629252fe8ef6460461409564e2c21d0c8e77e0944f3d189ff06c4e932ad"
 
 [[package]]
 name = "cc"
@@ -1643,9 +1650,10 @@ checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
 name = "hello-world"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -1908,6 +1916,7 @@ name = "invoke-signed"
 version = "0.1.0"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -2513,9 +2522,10 @@ dependencies = [
 
 [[package]]
 name = "overflows"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -5437,6 +5447,7 @@ name = "unchecked-bumps"
 version = "0.1.0"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -5448,6 +5459,7 @@ name = "unchecked-mint"
 version = "0.1.0"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -5456,9 +5468,10 @@ dependencies = [
 
 [[package]]
 name = "unchecked-owner"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
@@ -5470,6 +5483,7 @@ name = "unchecked-program"
 version = "0.1.0"
 dependencies = [
  "borsh 1.4.0",
+ "cargo-husky",
  "solana-program",
  "solana-program-test",
  "solana-sdk",

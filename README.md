@@ -18,7 +18,7 @@ Before diving into the labs, ensure you have:
 To embark on your journey with Solana Native Security Labs, start by cloning this repository to your local machine. Each lab is self-contained in its own directory under `labs/lab<num>`. For detailed instructions on how to navigate and complete a lab, refer to the README file within each lab's directory. Here's a quick overview of the steps you'll generally follow:
 1. Navigate to the lab's directory.
 2. Read the README file to understand the lab's objectives and vulnerabilities.
-3. Open tests/mod.rs to view the lab's tests and follow `test_works_properly` to understand the program's intended functionality.
+3. Open tests/mod.rs to view the lab's tests and follow `test_proper_flow` to understand the program's intended functionality.
 4. Modify indicated sections within the `hack` test to exploit the program's vulnerabilities.
 5. Tweak your code till you successfully exploit the vulnerability, indicated by both of the tests passing.
 
@@ -37,7 +37,7 @@ The labs cover a wide range of vulnerabilities, each designed to provide practic
 - `unchecked-signer`: Learn how to handle unchecked signers properly.
 
 Each lab includes two tests:
-1. `test_works_properly`: Demonstrates the intended operation of the program.
+1. `test_proper_flow`: Demonstrates the intended operation of the program.
 2. `hack`: A challenge to modify the program within specific markers to exploit vulnerabilities. This is your playground to apply what you've learned.
 
 Utility functions are provided in some test modules to facilitate interaction with the lab exercises.

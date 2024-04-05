@@ -1,6 +1,6 @@
 [package]
 name = "unchecked-owner"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Maciej Rak <maciejrak@protonmail.com>"]
 
@@ -14,3 +14,7 @@ solana-program = "1.18.8"
 solana-program-test = "1.18.8"
 solana-sdk = "1.18.8"
 spl-token = "4.0.0"
+
+
+[dev-dependencies]
+cargo-husky = "1"
