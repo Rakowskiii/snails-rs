@@ -30,7 +30,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn hello_world() {
+    async fn test_proper_flow() {
         let program_id = Pubkey::new_unique();
 
         let name = String::from("Blablador");
@@ -51,6 +51,31 @@ mod tests {
         let mut tx = Transaction::new_with_payer(&[ix], Some(&payer.pubkey()));
 
         tx.sign(&[&payer], recent_blockhash);
-        banks_client.process_transaction(tx).await.unwrap();
+        assert!(banks_client.process_transaction(tx).await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn hack() {
+        let program_id = Pubkey::new_unique();
+        let (mut banks_client, payer, recent_blockhash) =
+            ProgramTest::new("hello_world", program_id, processor!(process_instruction))
+                .start()
+                .await;
+
+        let name = String::from("hacker");
+
+        // --   HACK   --
+        // Change the instruction to force program to fail
+        let blabla_ix = instruction::BlabladurInstruction::WelcomeInstruction(name);
+        // -- END HACK --
+
+        let accounts = vec![];
+
+        let ix = Instruction::new_with_borsh(program_id, &blabla_ix, accounts);
+
+        let mut tx = Transaction::new_with_payer(&[ix], Some(&payer.pubkey()));
+
+        tx.sign(&[&payer], recent_blockhash);
+        assert!(banks_client.process_transaction(tx).await.is_err());
     }
 }
