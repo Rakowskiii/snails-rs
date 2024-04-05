@@ -1,0 +1,4 @@
+remove_nested_parens = true
+reorder_modules = true
+use_field_init_shorthand = true
+reorder_imports = true

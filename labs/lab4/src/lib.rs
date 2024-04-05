@@ -4,7 +4,6 @@ pub fn add(left: usize, right: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    
 
     #[test]
     fn it_works() {}

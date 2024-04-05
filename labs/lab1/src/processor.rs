@@ -39,11 +39,7 @@ impl Processor {
                 msg!("Initialising vault");
                 invoke_signed(
                     &system_instruction::create_account(
-                        player.key,
-                        vault.key,
-                        rent,
-                        len as u64,
-                        program_id,
+                        player.key, vault.key, rent, len as u64, program_id,
                     ),
                     &[player.clone(), vault.clone()],
                     &[&[&player.key.to_bytes()[..32], b"vault", &[bump]]],
