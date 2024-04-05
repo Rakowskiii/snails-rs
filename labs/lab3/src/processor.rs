@@ -74,11 +74,11 @@ impl Processor {
                 invoke(&ix, &[payer.clone(), config.clone()])?;
 
                 // Allocate space for the config
-                let ix = system_instruction::allocate(&config.key, len as u64);
+                let ix = system_instruction::allocate(config.key, len as u64);
                 invoke(&ix, &[config.clone()])?;
 
                 // Assign the config account to the program
-                let ix = system_instruction::assign(config.key, &program_id);
+                let ix = system_instruction::assign(config.key, program_id);
                 invoke(&ix, &[config.clone()])?;
 
                 // Create the config

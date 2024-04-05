@@ -1,6 +1,5 @@
 [package]
-name = "deserialisation"
-# account confusion
+name = "account-confusion"
 version = "0.1.0"
 edition = "2021"
 authors = ["Maciej Rak <maciejrak@protonmail.com>"]

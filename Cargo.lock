@@ -13,6 +13,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "account-confusion"
+version = "0.1.0"
+dependencies = [
+ "borsh 1.4.0",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-token",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1115,17 +1126,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "deserialisation"
-version = "0.1.0"
-dependencies = [
- "borsh 1.4.0",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-token",
 ]
 
 [[package]]
