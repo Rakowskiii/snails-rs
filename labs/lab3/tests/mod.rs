@@ -125,13 +125,13 @@ mod helper_contract {
         let len = std::mem::size_of::<account_confusion::state::Config>();
         let rent = solana_program::rent::Rent::get()?.minimum_balance(len);
 
-        let ix = system_instruction::transfer(&payer.key, &config.key, rent);
+        let ix = system_instruction::transfer(payer.key, config.key, rent);
         invoke(&ix, &[payer.clone(), config.clone()])?;
 
-        let ix = system_instruction::allocate(&config.key, len as u64);
+        let ix = system_instruction::allocate(config.key, len as u64);
         invoke(&ix, &[config.clone()])?;
 
-        let ix = system_instruction::assign(config.key, &program_id);
+        let ix = system_instruction::assign(config.key, program_id);
         invoke(&ix, &[config.clone()])?;
 
         config_data.serialize(&mut &mut config.data.borrow_mut()[..])?;
@@ -161,14 +161,14 @@ mod utils {
 
         pub async fn new_with_config<F>(keypair: Keypair, conf: F) -> Self
         where
-            F: FnOnce(&mut ProgramTest) -> (),
+            F: FnOnce(&mut ProgramTest),
         {
             Self::new_internal(keypair, Some(conf)).await
         }
 
         async fn new_internal<F>(keypair: Keypair, configurator: Option<F>) -> Self
         where
-            F: FnOnce(&mut ProgramTest) -> (),
+            F: FnOnce(&mut ProgramTest),
         {
             let config = keypair;
             let program_id = Pubkey::new_unique();

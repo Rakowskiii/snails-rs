@@ -50,8 +50,8 @@ impl Processor {
                 // ---- Set up the vault account ----
 
                 let ix = system_instruction::create_account(
-                    &payer.key,
-                    &vault.key,
+                    payer.key,
+                    vault.key,
                     solana_program::rent::Rent::get()?.minimum_balance(0),
                     0,
                     program_id,
@@ -70,15 +70,15 @@ impl Processor {
                 let rent = solana_program::rent::Rent::get()?.minimum_balance(len);
 
                 // Make sure rent is paid
-                let ix = system_instruction::transfer(&payer.key, &config.key, rent);
+                let ix = system_instruction::transfer(payer.key, config.key, rent);
                 invoke(&ix, &[payer.clone(), config.clone()])?;
 
                 // Allocate space for the config
-                let ix = system_instruction::allocate(&config.key, len as u64);
+                let ix = system_instruction::allocate(config.key, len as u64);
                 invoke(&ix, &[config.clone()])?;
 
                 // Assign the config account to the program
-                let ix = system_instruction::assign(config.key, &program_id);
+                let ix = system_instruction::assign(config.key, program_id);
                 invoke(&ix, &[config.clone()])?;
 
                 // Create the config

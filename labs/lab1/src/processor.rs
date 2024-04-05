@@ -39,8 +39,8 @@ impl Processor {
                 msg!("Initialising vault");
                 invoke_signed(
                     &system_instruction::create_account(
-                        &player.key,
-                        &vault.key,
+                        player.key,
+                        vault.key,
                         rent,
                         len as u64,
                         program_id,
