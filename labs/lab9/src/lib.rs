@@ -7,7 +7,6 @@ pub mod state;
 
 entrypoint!(process_instruction);
 
-// TDOO: Change this
 /// This is a example of storage vault
 /// The admin can initialize the contract by creating vault and config
 /// The admin address is stored in config
@@ -19,7 +18,7 @@ pub fn process_instruction(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    msg!("Welcome to the third lab!");
+    msg!("Welcome to the second lab!");
     if let Err(err) =
         crate::processor::Processor::process_instruction(program_id, accounts, instruction_data)
     {

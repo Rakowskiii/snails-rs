@@ -3,11 +3,13 @@ use solana_sdk::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
     msg,
-    program::{invoke, invoke_signed},
+    program::invoke_signed,
     pubkey::Pubkey,
     system_instruction,
     sysvar::Sysvar,
 };
+
+use crate::state;
 
 pub struct Processor {}
 
@@ -19,112 +21,206 @@ impl Processor {
     ) -> ProgramResult {
         let ix = crate::instruction::BlabladurInstruction::try_from_slice(instruction_data)?;
         match ix {
-            crate::instruction::BlabladurInstruction::Initialise => {
+            crate::instruction::BlabladurInstruction::InitialiseProgram => {
                 let accounts = &mut accounts.iter();
-                let payer = next_account_info(accounts)?;
-                let config = next_account_info(accounts)?;
-                let vault = next_account_info(accounts)?;
+                let admin = next_account_info(accounts)?;
+                let config_account = next_account_info(accounts)?;
+                let state_account = next_account_info(accounts)?;
 
-                // -------- check accounts --------
-                if !payer.is_signer {
-                    msg!("Payer is not a signer");
+                if !admin.is_signer {
+                    msg!("Admin is not a signer");
                     return Err(
                         solana_program::program_error::ProgramError::MissingRequiredSignature,
                     );
                 }
 
-                if !config.is_signer {
-                    msg!("Config is not a signer");
-                    return Err(
-                        solana_program::program_error::ProgramError::MissingRequiredSignature,
-                    );
-                }
+                let config = state::Config { admin: *admin.key };
+                let state = state::State { frozen: false };
 
-                let (vault_address, bump) = Pubkey::find_program_address(&[b"vault"], program_id);
+                // This is computation expensive and shouldn't be done in the program
+                // Should be provied by user and only verified in the program
+                let (config_calculated, config_bump) =
+                    Pubkey::find_program_address(&[b"config"], program_id);
+                let (state_calculated, state_bump) =
+                    Pubkey::find_program_address(&[b"state"], program_id);
 
-                if vault_address != *vault.key {
-                    msg!("Vault address is incorrect");
+                if *config_account.key != config_calculated {
+                    msg!("Config address is incorrect");
                     return Err(solana_program::program_error::ProgramError::InvalidArgument);
                 }
 
-                // ---- Set up the vault account ----
+                if *state_account.key != state_calculated {
+                    msg!("State address is incorrect");
+                    return Err(solana_program::program_error::ProgramError::InvalidArgument);
+                }
 
-                let ix = system_instruction::create_account(
-                    payer.key,
-                    vault.key,
-                    solana_program::rent::Rent::get()?.minimum_balance(0),
-                    0,
-                    program_id,
-                );
+                let config_space = std::mem::size_of::<state::Config>();
+                let state_space = std::mem::size_of::<state::State>();
+
+                let rent = solana_program::rent::Rent::get()?;
 
                 invoke_signed(
-                    &ix,
-                    &[payer.clone(), vault.clone()],
-                    &[&[b"vault", &[bump]]],
+                    &system_instruction::create_account(
+                        admin.key,
+                        config_account.key,
+                        rent.minimum_balance(config_space),
+                        config_space as u64,
+                        program_id,
+                    ),
+                    &[admin.clone(), config_account.clone()],
+                    &[&[b"config", &[config_bump]]],
                 )?;
 
-                // ---- transfer config ownership to program ----
+                invoke_signed(
+                    &system_instruction::create_account(
+                        admin.key,
+                        state_account.key,
+                        rent.minimum_balance(state_space),
+                        state_space as u64,
+                        program_id,
+                    ),
+                    &[admin.clone(), state_account.clone()],
+                    &[&[b"state", &[state_bump]]],
+                )?;
 
-                // Figure out account size and rent
-                let len = std::mem::size_of::<crate::state::Config>();
-                let rent = solana_program::rent::Rent::get()?.minimum_balance(len);
-
-                // Make sure rent is paid
-                let ix = system_instruction::transfer(payer.key, config.key, rent);
-                invoke(&ix, &[payer.clone(), config.clone()])?;
-
-                // Allocate space for the config
-                let ix = system_instruction::allocate(config.key, len as u64);
-                invoke(&ix, &[config.clone()])?;
-
-                // Assign the config account to the program
-                let ix = system_instruction::assign(config.key, program_id);
-                invoke(&ix, &[config.clone()])?;
-
-                // Create the config
-                let config_data = crate::state::Config { admin: *payer.key };
-
-                // Serialize the config into the account
-                config_data.serialize(&mut &mut config.data.borrow_mut()[..])?;
+                config.serialize(&mut &mut config_account.data.borrow_mut()[..])?;
+                state.serialize(&mut &mut state_account.data.borrow_mut()[..])?;
 
                 Ok(())
             }
 
-            crate::instruction::BlabladurInstruction::CloseContract => {
+            crate::instruction::BlabladurInstruction::InitialiseVault => {
                 let accounts = &mut accounts.iter();
-                let payer = next_account_info(accounts)?;
-                let config = next_account_info(accounts)?;
+                let user = next_account_info(accounts)?;
                 let vault = next_account_info(accounts)?;
 
-                if !payer.is_signer {
-                    msg!("Payer is not a signer");
+                let (vault_calculated, vault_bump) = Pubkey::find_program_address(
+                    &[&user.key.to_bytes()[..32], b"vault"],
+                    program_id,
+                );
+
+                if *vault.key != vault_calculated {
+                    msg!("User address is incorrect");
+                    return Err(solana_program::program_error::ProgramError::InvalidArgument);
+                }
+
+                let vault_space = std::mem::size_of::<state::Vault>();
+
+                invoke_signed(
+                    &system_instruction::create_account(
+                        user.key,
+                        vault.key,
+                        solana_program::rent::Rent::get()?.minimum_balance(vault_space),
+                        vault_space as u64,
+                        program_id,
+                    ),
+                    &[user.clone(), vault.clone()],
+                    &[&[&user.key.to_bytes()[..32], b"vault", &[vault_bump]]],
+                )?;
+
+                let user_data = state::Vault {
+                    authority: *user.key,
+                };
+
+                user_data.serialize(&mut &mut vault.data.borrow_mut()[..])?;
+
+                Ok(())
+            }
+
+            crate::instruction::BlabladurInstruction::Withdraw => {
+                msg!("Withdrawing...");
+                let accounts = &mut accounts.iter();
+                let user = next_account_info(accounts)?;
+                let vault = next_account_info(accounts)?;
+                let state = next_account_info(accounts)?;
+
+                let vault_data = crate::state::Vault::try_from_slice(&vault.data.borrow())?;
+                let state_data = crate::state::State::try_from_slice(&state.data.borrow())?;
+
+                if vault.owner != program_id {
+                    msg!("Vault is not owned by the program");
+                    return Err(solana_program::program_error::ProgramError::IncorrectProgramId);
+                }
+
+                if state.owner != program_id {
+                    msg!("State is not owned by the program");
+                    return Err(solana_program::program_error::ProgramError::IncorrectProgramId);
+                }
+
+                if !user.is_signer {
+                    msg!("User is not a signer");
                     return Err(
                         solana_program::program_error::ProgramError::MissingRequiredSignature,
                     );
                 }
 
-                // Load up the config
-                let config = crate::state::Config::try_from_slice(&config.data.borrow())?;
-
-                // Verify that the payer is the admin from the config
-                if config.admin != *payer.key {
-                    msg!("Payer is not the admin of the contract");
+                if *user.key != vault_data.authority {
+                    msg!("User is not the vault authority");
                     return Err(solana_program::program_error::ProgramError::InvalidArgument);
                 }
 
-                let (vault_key, _) = Pubkey::find_program_address(&[b"vault"], program_id);
+                if state_data.frozen {
+                    msg!("State is frozen");
+                    return Err(solana_program::program_error::ProgramError::InvalidArgument);
+                }
 
-                if vault_key != *vault.key {
+                //TODO: disclaimer
+                let (vault_calculated, _) = Pubkey::find_program_address(
+                    &[&user.key.to_bytes()[..32], b"vault"],
+                    program_id,
+                );
+
+                if vault_calculated != *vault.key {
                     msg!("Vault address is incorrect");
                     return Err(solana_program::program_error::ProgramError::InvalidArgument);
                 }
 
-                // ---- Close the vault account ----
                 let amount = vault.lamports();
-                **vault.lamports.borrow_mut() = 0;
-                **payer.lamports.borrow_mut() += amount;
+                **vault.lamports.borrow_mut() -= amount;
+                **user.lamports.borrow_mut() += amount;
 
                 msg!("Bye bye cruel world!");
+                Ok(())
+            }
+
+            crate::instruction::BlabladurInstruction::SetState { desired_state } => {
+                let accounts = &mut accounts.iter();
+                let admin = next_account_info(accounts)?;
+                let config = next_account_info(accounts)?;
+                let state = next_account_info(accounts)?;
+
+                if config.owner != program_id {
+                    msg!("Config is not owned by the program");
+                    return Err(solana_program::program_error::ProgramError::IncorrectProgramId);
+                }
+
+                if state.owner != program_id {
+                    msg!("State is not owned by the program");
+                    return Err(solana_program::program_error::ProgramError::IncorrectProgramId);
+                }
+
+                if !admin.is_signer {
+                    msg!("Admin is not a signer");
+                    return Err(
+                        solana_program::program_error::ProgramError::MissingRequiredSignature,
+                    );
+                }
+
+                let config_data = state::Config::try_from_slice(&config.data.borrow())?;
+
+                if config_data.admin != *admin.key {
+                    msg!("Admin is not the admin of the contract");
+                    return Err(solana_program::program_error::ProgramError::InvalidArgument);
+                }
+
+                let desired_state = match desired_state {
+                    crate::state::FreezeState::Frozen => state::State { frozen: true },
+                    crate::state::FreezeState::Unfrozen => state::State { frozen: false },
+                };
+
+                desired_state.serialize(&mut &mut state.data.borrow_mut()[..])?;
+
+                msg!("State has changed to {:?}", desired_state.frozen);
                 Ok(())
             }
         }

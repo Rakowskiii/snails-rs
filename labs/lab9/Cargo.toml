@@ -1,5 +1,5 @@
 [package]
-name = "account-confusion"
+name = "inconsitent-rounding"
 version = "0.1.1"
 edition = "2021"
 authors = ["Maciej Rak <maciejrak@protonmail.com>"]

@@ -12,6 +12,7 @@ impl Processor {
         match ix {
             crate::instruction::BlabladurInstruction::WelcomeInstruction(name) => {
                 msg!("Hello {}! Welcome to Blabladur Solana Security Labs!", name);
+
                 Ok(())
             }
             crate::instruction::BlabladurInstruction::NoOp => {
